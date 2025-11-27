@@ -2,7 +2,7 @@
 
 **DayMate**, an AI-powered daily planner that combines weather + news to produce a short daily plan and recommendations with a Lightweight FastAPI backend.
 
-> Live backend: **[https://daymate-bitmascot-backend.onrender.com](https://daymate-bitmascot-backend.onrender.com)**
+> Live backend: **[https://daymate-bitmascot-backend.onrender.com](https://daymate-bitmascot-backend.onrender.com)** <br>
 > API docs (Swagger UI): **[https://daymate-bitmascot-backend.onrender.com/docs](https://daymate-bitmascot-backend.onrender.com/docs)**
 
 ---
@@ -262,5 +262,6 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 © Raihan Sarker
 🔗 [LinkedIn](https://www.linkedin.com/in/raihan82/) | 📫 Email: [raihansarker820@gmail.com](mailto:raihansarker820@gmail.com)
+
 
 
