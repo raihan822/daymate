@@ -1,5 +1,5 @@
 # backend/main.py
-# Loading .env file for loacl testing:
+# Loading .env file for local testing:
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,22 +12,37 @@ import httpx    # better alternative to requests
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
 
-# Retrieving All API Keys from Env var:
+# Retrieving All API Keys from Env var:---
 OPENWEATHER_KEY = os.getenv("OPENWEATHER_KEY")
 GNEWS_API_KEY = os.getenv("GNEWS_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
 
-# API Base Links:
-WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
-              #GET https://api.openweathermap.org/data/2.5/weather ?lat={lat}&lon={lon}&appid={API key}
-NEWS_URL = "https://newsapi.org/v2/top-headlines"
-            #GET https://newsapi.org/v2/top-headlines ?country=us&apiKey=API_KEY
+# API Base Links:---
+WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"     #GET https://api.openweathermap.org/data/2.5/weather ?lat={lat}&lon={lon}&appid={API key}
+NEWS_URL = "https://newsapi.org/v2/top-headlines"       #GET https://newsapi.org/v2/top-headlines ?country=us&apiKey=API_KEY
 GNEWS_URL = "https://gnews.io/api/v4/top-headlines"
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+
+# Homepage route (Default):---
+from fastapi.responses import RedirectResponse
+@app.get("/")
+async def docs_redirect():
+    return RedirectResponse(url="/docs")
+
+# @app.get("/")
+# async def root():
+#     return {
+#         "message": "Welcome to DayMate API!",
+#         "docs_url": "/docs",
+#         "status": "running"
+#     }
+
+
+# My Main APIs:---
+# @app.get("/health")
+# async def health():
+#     return {"status": "ok"}
 
 
 @app.get("/weather")
@@ -86,7 +101,7 @@ def load_llm(model_name, base_url, api_key_env):
     )
 
 
-# LLM Final Reasoning:
+# LLM Final Reasoning:---
 class PlanRequest(BaseModel): # Post body
     # BD lat == 23.7104
     # BD lon == 90.40744
