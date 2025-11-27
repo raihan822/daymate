@@ -261,12 +261,4 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 ---
 
 © Raihan Sarker
-
----
-
-If you want, I can:
-
-* add a short `curl` + example response section for each endpoint (with sample output), or
-* patch the root route to return a custom JSON message (instead of redirect), and provide the exact `git` commands to push this fix to the branch you deploy. Which would you prefer?
-
-
+🔗 [LinkedIn](https://www.linkedin.com/in/raihan82/) | 📫 Email: [raihansarker820@gmail.com](mailto:raihansarker820@gmail.com)
