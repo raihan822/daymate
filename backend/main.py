@@ -71,21 +71,7 @@ async def get_news(country: str = "bd", q: str | None = None):
     # print([a.get("title") for a in news.get("articles", [])[:5]])
     return r.json()
 
-
-# old========================================================================
-# @app.get("/news")
-# async def get_news(country: str = "bd", q: str | None = None): #country should be 2digit value, like BD
-#     if not NEWSAPI_KEY:
-#         raise HTTPException(status_code=500, detail="NEWSAPI_KEY not configured")
-#     params = {"apiKey": NEWSAPI_KEY, "country": country}
-#     if q:
-#         params["q"] = q
-#     async with httpx.AsyncClient(timeout=10) as client:
-#         r = await client.get(NEWS_URL, params=params)   #"https://newsapi.org/v2/top-headlines"
-#     if r.status_code != 200:
-#         raise HTTPException(status_code=502, detail="News API error")
-#     return r.json()
-# ========================================================================
+# LLM Integration Function:
 from langchain_openai import ChatOpenAI
 def load_llm(model_name, base_url, api_key_env):
     return ChatOpenAI(
@@ -100,6 +86,7 @@ def load_llm(model_name, base_url, api_key_env):
     )
 
 
+# LLM Final Reasoning:
 class PlanRequest(BaseModel): # Post body
     # BD lat == 23.7104
     # BD lon == 90.40744
@@ -110,25 +97,25 @@ class PlanRequest(BaseModel): # Post body
 
 @app.post("/plan")
 async def generate_plan(req: PlanRequest):
-    # fetch weather (my backend api call)
+    # fetching weather (my backend api call)
     weather = await get_weather(req.lat, req.lon)
 
-    # fetch news [Default Country: BD] (my backend api call)
+    # fetching news [Default Country: BD] (my backend api call)
     news = await get_news(country="bd")
     headlines = [a.get("title") for a in news.get("articles", [])[:5]]  # Safe extraction of the dict.get() value with default value []
 
-    # My Prompt for the RAG system:
+    # Prompt for the RAG system:
     prompt = (
         f"User is at {req.location_name or f'{req.lat},{req.lon}'}. "
         f"Weather: {weather.get('weather')[0].get('description')}, temp {weather.get('main').get('temp')}°C. "
         f"Top headlines: {headlines}. "
         "Generate a concise daily plan (3-6 items) and practical recommendations (carry items, suggest reschedule if needed)."
     )
-    print("Prompt is: \n",prompt)
+    # print("Prompt is: \n",prompt)
 
     # Calling AI Model:--
     if GROQ_API_KEY:
-        print("LLM key is Found. Prompting with LLM...")
+        print("\nLLM key is Found. Prompting with LLM...\n")
         llm = load_llm(
             model_name="llama-3.3-70b-versatile",
             base_url="https://api.groq.com/openai/v1",
@@ -173,11 +160,11 @@ if __name__ == "__main__":
     # Async runner to call the async function
     import asyncio
     result = asyncio.run(generate_plan(payload))
-    print(result)
+    print(result.get("planning","No Result from LLM"))
 
 
 
-# Notes:----
+# My Notes:----
 # uvicorn entrypoint for Render / Railway
     # Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
