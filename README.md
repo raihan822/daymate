@@ -1,6 +1,6 @@
-# DayMate — Backend
+# DayMate
 
-**Lightweight FastAPI backend for DayMate**, an AI-powered daily planner that combines weather + news to produce a short daily plan and recommendations.
+**DayMate**, an AI-powered daily planner that combines weather + news to produce a short daily plan and recommendations with a Lightweight FastAPI backend.
 
 > Live backend: **[https://daymate-bitmascot-backend.onrender.com](https://daymate-bitmascot-backend.onrender.com)**
 > API docs (Swagger UI): **[https://daymate-bitmascot-backend.onrender.com/docs](https://daymate-bitmascot-backend.onrender.com/docs)**
@@ -269,3 +269,4 @@ If you want, I can:
 
 * add a short `curl` + example response section for each endpoint (with sample output), or
 * patch the root route to return a custom JSON message (instead of redirect), and provide the exact `git` commands to push this fix to the branch you deploy. Which would you prefer?
+
