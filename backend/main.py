@@ -86,6 +86,18 @@ async def get_news(country: str = "bd", q: str | None = None):
 #         raise HTTPException(status_code=502, detail="News API error")
 #     return r.json()
 # ========================================================================
+from langchain_openai import ChatOpenAI
+def load_llm(model_name, base_url, api_key_env):
+    return ChatOpenAI(
+        model=model_name,
+        openai_api_base = base_url,
+        openai_api_key = os.getenv(api_key_env),
+        timeout=60,
+        max_tokens=350,
+        # temperature=0.2,
+        # top_p=0.95,
+        max_retries=2
+    )
 
 
 class PlanRequest(BaseModel): # Post body
@@ -98,11 +110,6 @@ class PlanRequest(BaseModel): # Post body
 
 @app.post("/plan")
 async def generate_plan(req: PlanRequest):
-    # Compose a compact prompt using weather + news (fetching inline)
-    # 1) get weather
-    # 2) get headlines
-    # 3) call OpenAI (or return a deterministic fallback when API key absent)
-
     # fetch weather (my backend api call)
     weather = await get_weather(req.lat, req.lon)
 
@@ -121,21 +128,23 @@ async def generate_plan(req: PlanRequest):
 
     # Calling AI Model:--
     if GROQ_API_KEY:
-        # Example using openai (pseudo). Keep keys in env and do not commit.
-        import os, json
-        # NOTE: user must install openai and set GROQ_API_KEY
-        import openai
-        openai.api_key = GROQ_API_KEY
-        completion = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "system", "content": "You are DayMate, a helpful daily planner."},
-                      {"role": "user", "content": prompt}],
-            max_tokens=350,
+        print("LLM key is Found. Prompting with LLM...")
+        llm = load_llm(
+            model_name="llama-3.3-70b-versatile",
+            base_url="https://api.groq.com/openai/v1",
+            api_key_env="GROQ_API_KEY"
         )
-        text = completion.choices[0].message.content
+        response = llm.invoke([
+            {"role": "system",
+             "content": "You are DayMate, a helpful daily planner."},
+            {"role": "user",
+             "content": prompt}
+        ])
+        text = response.content
         return {"planning": text, "prompt": prompt}
-    else:
-        # //fallback//
+
+    else:   # //fallback logic: manual//
+        print("LLM key not Found. manual reasoning...")
         plan = []
         desc = weather.get('weather')[0].get('main', '')
         if 'rain' in desc.lower():
@@ -166,12 +175,14 @@ if __name__ == "__main__":
     result = asyncio.run(generate_plan(payload))
     print(result)
 
+
+
 # Notes:----
 # uvicorn entrypoint for Render / Railway
-# Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
+    # Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
 # During Dev:--
-# uvicorn filename:fastapiObj --reload
+    # uvicorn filename:fastapiObj --reload
 
-# pyenv shell 3.11.14
-# uvicorn main:app --reload --port $PORT
+    # pyenv shell 3.11.14
+    # uvicorn main:app --reload --port $PORT
