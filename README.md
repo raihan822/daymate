@@ -244,7 +244,7 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 # Future Plan:
 
-* **Frontend** is pending; the repo contains a `frontend/` scaffold. When the frontend is ready, I will update the README and CORS settings if needed.
+* **Frontend** is pending; the repo contains a `frontend/` scaffold. I will use **React framework** for the frontend. When the frontend is ready, I will update the README and CORS settings if needed.
 * will add a `/health` or `/ping` endpoint for uptime checks (for load balancers/uptime monitors).
 * Will add unit tests for the fallback planner and input validation.
 * will add rate-limiting / caching of 3rd-party responses to avoid hitting API quotas.
@@ -262,4 +262,5 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 © Raihan Sarker
 🔗 [LinkedIn](https://www.linkedin.com/in/raihan82/) | 📫 Email: [raihansarker820@gmail.com](mailto:raihansarker820@gmail.com)
+
 
