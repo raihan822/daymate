@@ -124,7 +124,7 @@ async def generate_plan(req: PlanRequest):
         f"Top headlines: {headlines}. "
         "Generate a concise daily plan (3-6 items) and practical recommendations (carry items, suggest reschedule if needed)."
     )
-    print(prompt)
+    print("Prompt is: \n",prompt)
 
     # Calling AI Model:--
     if GROQ_API_KEY:
@@ -162,7 +162,6 @@ async def generate_plan(req: PlanRequest):
         plan.append("Suggested schedule: morning focus work, afternoon errands with buffer time.")
         return {"planning": '\n'.join(plan), "prompt": prompt}
 
-import asyncio
 if __name__ == "__main__":
     # Test Payload:
     payload = PlanRequest(
@@ -172,6 +171,7 @@ if __name__ == "__main__":
     )
 
     # Async runner to call the async function
+    import asyncio
     result = asyncio.run(generate_plan(payload))
     print(result)
 
@@ -183,6 +183,7 @@ if __name__ == "__main__":
 
 # During Dev:--
     # uvicorn filename:fastapiObj --reload
+    # uvicorn main:app --reload
 
     # pyenv shell 3.11.14
     # uvicorn main:app --reload --port $PORT
