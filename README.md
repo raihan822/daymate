@@ -80,8 +80,8 @@ daymate/
 1. Clone repository and change to backend directory:
 
 ```bash
-git clone https://github.com/raihan822/daymate-bitmascot.git
-cd daymate-bitmascot/backend
+git clone https://github.com/raihan822/daymate.git
+cd daymate/backend
 ```
 
 2. Create a virtual environment and install:
@@ -262,6 +262,7 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 © Raihan Sarker
 🔗 [LinkedIn](https://www.linkedin.com/in/raihan82/) | 📫 Email: [raihansarker820@gmail.com](mailto:raihansarker820@gmail.com)
+
 
 
 
