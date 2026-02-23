@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
 
 
-# My Notes:----
+#Notes:----
 # uvicorn command for Render
     # Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
