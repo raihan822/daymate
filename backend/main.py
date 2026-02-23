@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Other Library imports:
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException  #for FastAPI
+from pydantic import BaseModel  #for better type checking
 import os
-import httpx    # better alternative to requests
+import httpx    # better alternative to requests that I used with BS4, Sel
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
@@ -24,10 +24,11 @@ NEWS_URL = "https://newsapi.org/v2/top-headlines"       #GET https://newsapi.org
 GNEWS_URL = "https://gnews.io/api/v4/top-headlines"
 
 
-# Homepage route (Default):---
+## Homepage route (Default):---
 # from fastapi.responses import RedirectResponse
 # @app.get("/")
 # async def docs_redirect():
+#       #"from root to root/docs auto redirects"
 #     return RedirectResponse(url="/docs")
 
 @app.get("/")
@@ -40,7 +41,8 @@ async def root():
     }
 
 
-# My Main APIs:---
+# My Main APIs:--->
+
 # @app.get("/health")
 # async def health():
 #     return {"status": "ok"}
@@ -51,11 +53,18 @@ async def get_weather(lat: float, lon: float):
     # GET, 'http://127.0.0.1:8000/weather?lat=23.7104&lon=90.40744' #my_backend_api
     if not OPENWEATHER_KEY:
         raise HTTPException(status_code=500, detail="OPENWEATHER_KEY not configured")
-    params = {"lat": lat, "lon": lon, "appid": OPENWEATHER_KEY, "units": "metric"}
+    params = {  #payload
+        "lat": lat,
+        "lon": lon,
+        "appid": OPENWEATHER_KEY,
+        "units": "metric"
+    }
     async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.get(WEATHER_URL, params=params)    #"https://api.openweathermap.org/data/2.5/weather"
+        r = await client.get(WEATHER_URL, params=params)    #"https://api.openweathermap.org/data/2.5/weather" with payload
+
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail="Weather API error")
+
     return r.json()
 
 
@@ -65,7 +74,7 @@ async def get_news(country: str = "bd", q: str | None = None):
         # It's better practice to use the actual variable name in the error message
         raise HTTPException(status_code=500, detail="GNEWS_API_KEY not configured")
 
-    params = {
+    params = {  #payload
         "apikey": GNEWS_API_KEY,      # GNews API KEY
         "category": "general",       # category
         "lang": "en",                # language
@@ -89,7 +98,7 @@ async def get_news(country: str = "bd", q: str | None = None):
 
 # LLM Integration Function:
 from langchain_openai import ChatOpenAI
-def load_llm(model_name, base_url, api_key_env):
+def load_llm(model_name :str, base_url :str, api_key_env :str) ->object:
     return ChatOpenAI(
         model=model_name,
         openai_api_base = base_url,
@@ -102,7 +111,8 @@ def load_llm(model_name, base_url, api_key_env):
     )
 
 
-# LLM Final Reasoning:---
+# LLM Final Reasoning: --->
+
 class PlanRequest(BaseModel): # Post body
     # BD lat == 23.7104
     # BD lon == 90.40744
@@ -132,11 +142,17 @@ async def generate_plan(req: PlanRequest):
     # Calling AI Model:--
     if GROQ_API_KEY:
         print("\nLLM key is Found. Prompting with LLM...\n")
-        llm = load_llm(
+        llm = load_llm( #instance of the object Class OpenChatAi returned from load_llm() function
             model_name="llama-3.3-70b-versatile",
             base_url="https://api.groq.com/openai/v1",
             api_key_env="GROQ_API_KEY"
         )
+        # llm2 = load_llm(    #another instance for loading a smaller model for inference.
+        #     model_name="llama-3.1-8b-instant",
+        #     base_url = "https://api.groq.com/openai/v1",
+        #     api_key_env = os.getenv("GROQ_API_KEY")
+        # )
+
         response = llm.invoke([
             {"role": "system",
              "content": "You are DayMate, a helpful daily planner."},
@@ -167,13 +183,13 @@ async def generate_plan(req: PlanRequest):
 
 if __name__ == "__main__":
     # Test Payload:
-    payload = PlanRequest(
+    payload = PlanRequest(  #payload values type checked with pydentic
         location_name="bd",
         lat=23.7104,
         lon=90.40744
     )
 
-    # Async runner to call the async function
+    # Async runner to call the async type functions
     import asyncio
     result = asyncio.run(generate_plan(payload))
     print("Prompt is ===>\n",result.get("prompt","No Prompt Pushed!"))
