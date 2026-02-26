@@ -97,17 +97,30 @@ async def get_news(country: str = "bd", q: str | None = None):
     return r.json()
 
 # LLM Integration Function:
-from langchain_openai import ChatOpenAI
-def load_llm(model_name :str, base_url :str, api_key_env :str) ->object:
+    # Generalised Ai-Model Calling for the 'OpenAI-compatible' API providers
+    # This will apply for all that follow OpenAI’s message schema
+''' There are different types of LLM API Calling Style
+Layer 1 → Raw provider SDK (different different company's own style of calling)
+Layer 2 → API abstraction (LiteLLM)
+Layer 3 → Framework abstraction (LangChain)
+    > I am using LangChain's only the OpenAi format schema generalization 'langchain_openai'.
+'''
+from langchain_openai import ChatOpenAI     #ChatOpenAI is a LangChain wrapper, So basically I am using LangChain wrapped with higher level library
+def load_llm(model_name :str, base_url :str, api_key_env :str,
+             max_retries:int,  top_p: float, temperature: float,
+             timeout: int=60, max_tokens: int=350) ->object:
     return ChatOpenAI(
+        #General Params:
         model=model_name,
         openai_api_base = base_url,
         openai_api_key = os.getenv(api_key_env),
-        timeout=60,
-        max_tokens=350,
-        # temperature=0.2,
-        # top_p=0.95,
-        max_retries=2
+
+        #Other Configs:
+        timeout=timeout,
+        max_tokens=max_tokens,
+        # temperature=temperature, #0.2
+        # top_p=top_p, #0.95
+        max_retries=max_retries #2
     )
 
 
@@ -130,13 +143,19 @@ async def generate_plan(req: PlanRequest):
     news = await get_news(country="bd")
     headlines = [a.get("title") for a in news.get("articles", [])[:5]]  # Safe extraction of the dict.get() value with default value []
 
-    # Prompt for the RAG system:
+    # Prompt & Message for the RAG system (Ai-model):
     prompt = (
         f"User is at {req.location_name or f'{req.lat},{req.lon}'}. "
         f"Weather: {weather.get('weather')[0].get('description')}, temp {weather.get('main').get('temp')}°C. "
         f"Top headlines: {headlines}. "
         "Generate a concise daily plan (3-6 items) and practical recommendations (carry items, suggest reschedule if needed)."
     )
+    message = [
+        {"role": "system",
+         "content": "You are DayMate, a helpful daily planner."},
+        {"role": "user",
+         "content": prompt}
+    ]
     # print("Prompt is ===>\n",prompt)
 
     # Calling AI Model:--
@@ -152,15 +171,9 @@ async def generate_plan(req: PlanRequest):
         #     base_url = "https://api.groq.com/openai/v1",
         #     api_key_env = os.getenv("GROQ_API_KEY")
         # )
-
-        response = llm.invoke([
-            {"role": "system",
-             "content": "You are DayMate, a helpful daily planner."},
-            {"role": "user",
-             "content": prompt}
-        ])
-        text = response.content
-        return {"planning": text, "prompt": prompt}
+        response = llm.invoke(message)  # made the message with the prompt above!
+        response_text = response.content
+        return {"planning": response_text, "prompt": prompt}
 
     else:   # //fallback logic: manual//
         print("LLM key not Found. manual reasoning...")
