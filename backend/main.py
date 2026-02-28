@@ -1,28 +1,52 @@
-# backend/main.py
+"""
+backend/main.py
+"""
 # Loading .env file for local testing:
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv()   #loads the api keys stored in the .env file and then acts like os.getenv() function as like os env ver
 
 # Other Library imports:
 from fastapi import FastAPI, HTTPException  #for FastAPI
-from pydantic import BaseModel  #for better type checking
-import os
 import httpx    # better alternative to requests that I used with BS4, Sel
+import os
+
+"""Best Practice. Always Do type checking with pydentic for API call with PAYLOAD(s), 
+You can also combine the API_KEYs+PROVIDER_NAME+BASE_URL etc 
+later API_KEY raw value can be caught with you_masked_apikey.get_secret_value()
+
+"""
+from pydantic import BaseModel, SecretStr  #for explicit type checking, Generally used with fastAPI, and other libraries requiring strict type formalities of the variables.
+
+# All API Keys for the Project:---
+class AiModelClass(BaseModel):
+    model_name: str
+    api_key: SecretStr
+    provider_name: str
+    base_url: str
+
+instance_groq_model = AiModelClass(
+    model_name="llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),  # Pydentic will auto convert this str into SecretStr! You can do --> `raw_key = instance_groq_model.api_key.get_secret_value()` to read/get actual api_key value.
+    provider_name="openai",
+    base_url="https://api.groq.com/openai/v1"
+)
+#instance_gemini_model = AiModelClass().. etc
+
+OPENWEATHER = {
+    'api_key' : os.getenv("OPENWEATHER_KEY"),
+    'base_url': "https://api.openweathermap.org/data/2.5/weather"     #GET https://api.openweathermap.org/data/2.5/weather ?lat={lat}&lon={lon}&appid={API key}
+}
+
+GNEWS = {
+    'api_key' : os.getenv("GNEWS_API_KEY"),
+    'base_url' : "https://gnews.io/api/v4/top-headlines"
+}
+
+
+
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
-
-# Retrieving All API Keys from Env var:---
-OPENWEATHER_KEY = os.getenv("OPENWEATHER_KEY")
-GNEWS_API_KEY = os.getenv("GNEWS_API_KEY")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
-
-# API Base Links:---
-WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"     #GET https://api.openweathermap.org/data/2.5/weather ?lat={lat}&lon={lon}&appid={API key}
-NEWS_URL = "https://newsapi.org/v2/top-headlines"       #GET https://newsapi.org/v2/top-headlines ?country=us&apiKey=API_KEY
-GNEWS_URL = "https://gnews.io/api/v4/top-headlines"
-
 
 ## Homepage route (Default):---
 # from fastapi.responses import RedirectResponse
@@ -51,16 +75,16 @@ async def root():
 @app.get("/weather")
 async def get_weather(lat: float, lon: float):
     # GET, 'http://127.0.0.1:8000/weather?lat=23.7104&lon=90.40744' #my_backend_api
-    if not OPENWEATHER_KEY:
-        raise HTTPException(status_code=500, detail="OPENWEATHER_KEY not configured")
+    if not OPENWEATHER['api_key'] or not OPENWEATHER['base_url']:
+        raise HTTPException(status_code=500, detail="OPENWEATHER_KEY or Open Weather URL not configured")
     params = {  #payload
         "lat": lat,
         "lon": lon,
-        "appid": OPENWEATHER_KEY,
+        "appid": OPENWEATHER['api_key'],
         "units": "metric"
     }
     async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.get(WEATHER_URL, params=params)    #"https://api.openweathermap.org/data/2.5/weather" with payload
+        r = await client.get(OPENWEATHER['base_url'], params=params)    #"https://api.openweathermap.org/data/2.5/weather" with payload
 
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail="Weather API error")
@@ -70,12 +94,12 @@ async def get_weather(lat: float, lon: float):
 
 @app.get("/news")
 async def get_news(country: str = "bd", q: str | None = None):
-    if not GNEWS_API_KEY:
+    if not GNEWS['api_key'] or not GNEWS['base_url']:
         # It's better practice to use the actual variable name in the error message
-        raise HTTPException(status_code=500, detail="GNEWS_API_KEY not configured")
+        raise HTTPException(status_code=500, detail="GNEWS_API_KEY or URL not configured")
 
     params = {  #payload
-        "apikey": GNEWS_API_KEY,      # GNews API KEY
+        "apikey": GNEWS['api_key'],      # GNews API KEY
         "category": "general",       # category
         "lang": "en",                # language
         "max": 5,                    # max results
@@ -86,7 +110,7 @@ async def get_news(country: str = "bd", q: str | None = None):
         params["q"] = q
 
     async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.get(GNEWS_URL, params=params)
+        r = await client.get(GNEWS['base_url'], params=params)
 
     if r.status_code != 200:
         # Check the response text for specific GNews error messages
@@ -105,37 +129,139 @@ Layer 2 → API abstraction (LiteLLM)
 Layer 3 → Framework abstraction (LangChain)
     > I am using LangChain's only the OpenAi format schema generalization 'langchain_openai'.
 '''
-from langchain_openai import ChatOpenAI     #ChatOpenAI is a LangChain wrapper, So basically I am using LangChain wrapped with higher level library
-def load_llm(model_name :str, base_url :str, api_key_env :str,
-             max_retries:int,  top_p: float, temperature: float,
-             timeout: int=60, max_tokens: int=350) ->object:
-    return ChatOpenAI(
-        #General Params:
-        model=model_name,
-        openai_api_base = base_url,
-        openai_api_key = os.getenv(api_key_env),
+from langchain_core.language_models import BaseChatModel #[Optional] for return type check.
 
-        #Other Configs:
-        timeout=timeout,
-        max_tokens=max_tokens,
-        # temperature=temperature, #0.2
-        # top_p=top_p, #0.95
-        max_retries=max_retries #2
-    )
+from typing import Optional, Union
+def load_llm(
+        # Required Params:-
+        model_provider: str,
+        model_name :str,
+        model_api_key :Union[str, SecretStr],
+
+        # [Optional] BASE_URL (Required for OpenAI-compatible APIs Providers like GROQ,ChatGPT, etc.)
+        base_url: Optional[str] = None,
+
+        # General Configuration Settings:-
+        model_top_p: float = 1.0,
+        model_temperature: float = 0.7,    #0.7 is langchain default
+        model_max_tokens: Optional[int]= None,
+        # Other Configs:
+        model_timeout: int=60,
+        model_max_retries:int = 2
+) -> BaseChatModel:
+    # #Can be used to convert a str to secretstr for langchain params:-
+    # from langchain_core.utils import convert_to_secret_str    #then use convert_to_secret_str() function
+
+    if not model_api_key:
+        raise ValueError(f"API Key not found. {model_api_key}")
+    model_provider = model_provider.lower()
+
+    # 1. OpenAI-Compatible APIs (OpenAI / Groq / Compatible):-
+    if model_provider == 'openai':
+        try:
+            #pip install langchain-openai
+            from langchain_openai import ChatOpenAI # ChatOpenAI is a LangChain wrapper from LangChain.
+        except ImportError:
+            raise ImportError("Could not import langchain-openai. "
+                              "Please install it with: pip install langchain-openai")
+
+        return ChatOpenAI(
+            #General Params:
+            model = model_name,
+            api_key = model_api_key,
+            base_url = base_url,
+
+            #Other Configs:
+            temperature = model_temperature,
+            top_p = model_top_p,
+            max_tokens = model_max_tokens,
+            timeout = model_timeout,
+            max_retries = model_max_retries
+        )
+    # 2. Anthropic (Claude):-
+    elif model_provider == 'anthropic':
+        try:
+            #pip install langchain-anthropic
+            from langchain_anthropic import ChatAnthropic
+        except ImportError:
+            raise ImportError("Could not import langchain-anthropic. "
+                              "Please install it with: pip install langchain-anthropic")
+        return ChatAnthropic(
+            model=model_name,
+            api_key=model_api_key,
+            anthropic_api_url = base_url,
+
+            temperature = model_temperature,
+            max_tokens = model_max_tokens,
+            timeout = model_timeout,
+            max_retries = model_max_retries
+        )
+    # 3. Google Gemini:-
+    elif model_provider == 'google':
+        try:
+            # pip install langchain-google-genai
+            from langchain_google_genai import ChatGoogleGenerativeAI
+        except ImportError:
+            raise ImportError("Could not import langchain-google-genai. "
+                              "Please install it with: pip install langchain-google-genai")
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            google_api_key=model_api_key,
+
+            temperature=model_temperature,
+            top_p=model_top_p,
+            max_output_tokens=model_max_tokens,
+        )
+    # 4. Mistral:-
+    elif model_provider == 'mistral':
+        try:
+            #pip install langchain-mistralai
+            from langchain_mistralai import ChatMistralAI
+        except ImportError:
+            raise ImportError("Could not import langchain-mistralai. "
+                              "Please install it with: pip install langchain-mistralai")
+        return ChatMistralAI(
+            model=model_name,
+            api_key=model_api_key,
+            endpoint=base_url,
+
+            temperature=model_temperature,
+            top_p=model_top_p,
+            max_tokens=model_max_tokens,
+            timeout=model_timeout,
+            max_retries=model_max_retries
+        )
+    # 5. Cohere:-
+    elif model_provider == "cohere":
+        try:
+            #pip install langchain-cohere
+            from langchain_cohere import ChatCohere
+        except ImportError:
+            raise ImportError("Could not import langchain-cohere. "
+                              "Please install it with: pip install langchain-cohere")
+        return ChatCohere(
+            model=model_name,
+            cohere_api_key=model_api_key,
+            base_url = base_url,
+
+            temperature=model_temperature,
+            max_tokens=model_max_tokens,
+        )
+
+    else:
+        raise ValueError(f"Unsupported provider: {model_provider}. May needs setup!")
+
 
 
 # LLM Final Reasoning: --->
-
-class PlanRequest(BaseModel): # Post body
-    # BD lat == 23.7104
-    # BD lon == 90.40744
-
-    lat: float
-    lon: float
+from langchain_core.messages import HumanMessage, SystemMessage
+class PlanRequestClass(BaseModel):  # Payload for POST. Strict Type checked with Pydentic!
+    lat: float  # BD lat == 23.7104
+    lon: float  # BD lon == 90.40744
     location_name: str | None = None
 
 @app.post("/plan")
-async def generate_plan(req: PlanRequest):
+async def generate_plan(req: PlanRequestClass):
     # fetching weather (my backend api call)
     weather = await get_weather(req.lat, req.lon)
 
@@ -150,26 +276,31 @@ async def generate_plan(req: PlanRequest):
         f"Top headlines: {headlines}. "
         "Generate a concise daily plan (3-6 items) and practical recommendations (carry items, suggest reschedule if needed)."
     )
+    # message = [
+    #     {"role": "system",
+    #      "content": "You are DayMate, a helpful daily planner."},
+    #     {"role": "user",
+    #      "content": prompt}
+    # ]
     message = [
-        {"role": "system",
-         "content": "You are DayMate, a helpful daily planner."},
-        {"role": "user",
-         "content": prompt}
+        SystemMessage(content="You are DayMate, a helpful daily planner."),
+        HumanMessage(content=prompt)
     ]
     # print("Prompt is ===>\n",prompt)
 
     # Calling AI Model:--
-    if GROQ_API_KEY:
+    if instance_groq_model.api_key:
         print("\nLLM key is Found. Prompting with LLM...\n")
         llm = load_llm( #instance of the object Class OpenChatAi returned from load_llm() function
-            model_name="llama-3.3-70b-versatile",
-            base_url="https://api.groq.com/openai/v1",
-            api_key_env="GROQ_API_KEY"
+            model_provider=instance_groq_model.provider_name,
+            model_name=instance_groq_model.model_name,
+            model_api_key=instance_groq_model.api_key,
+            base_url=instance_groq_model.base_url
         )
         # llm2 = load_llm(    #another instance for loading a smaller model for inference.
         #     model_name="llama-3.1-8b-instant",
         #     base_url = "https://api.groq.com/openai/v1",
-        #     api_key_env = os.getenv("GROQ_API_KEY")
+        #     model_api_key = os.getenv("GROQ_API_KEY")
         # )
         response = llm.invoke(message)  # made the message with the prompt above!
         response_text = response.content
@@ -196,7 +327,7 @@ async def generate_plan(req: PlanRequest):
 
 if __name__ == "__main__":
     # Test Payload:
-    payload = PlanRequest(  #payload values type checked with pydentic
+    instance_payload = PlanRequestClass(  #payload values type checked with pydentic Python-library
         location_name="bd",
         lat=23.7104,
         lon=90.40744
@@ -204,7 +335,7 @@ if __name__ == "__main__":
 
     # Async runner to call the async type functions
     import asyncio
-    result = asyncio.run(generate_plan(payload))
+    result = asyncio.run(generate_plan(instance_payload))
     print("Prompt is ===>\n",result.get("prompt","No Prompt Pushed!"))
     print("\nLLM Result ===>\n",result.get("planning","No Result from LLM!"))
 
