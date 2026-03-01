@@ -1,4 +1,6 @@
 #backend/main.py
+#todo: fix bug, now response from News.!
+
 from fastapi import FastAPI  #for FastAPI
 
 # AI Integration:
@@ -91,7 +93,8 @@ async def generate_plan(req: PlanRequestClass):
         return {"planning": '\n'.join(plan), "prompt": prompt}
 
 if __name__ == "__main__":
-    # Test Payload:
+    # Local Testing:-
+    # Payload:
     instance_payload = PlanRequestClass(  #payload values type checked with pydentic Python-library
         location_name="bd",
         lat=23.7104,
