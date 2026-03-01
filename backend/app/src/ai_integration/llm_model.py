@@ -1,4 +1,4 @@
-""" -----   LOADING A MODEL WITH RECEIVED CONFIGURATIONS -----   """
+""" -----   LOADING A MODEL (as Object) WITH RECEIVED CONFIGURATIONS -----   """
 
 # LLM Integration Function: Generalised Ai-Model Calling
 ''' There are different types of LLM API Calling Style

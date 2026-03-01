@@ -1,11 +1,11 @@
 #backend/main.py
-from fastapi import FastAPI, HTTPException  #for FastAPI
-import httpx    # better alternative of `requests` that I used with BS4, Sel
+from fastapi import FastAPI  #for FastAPI
 
 # AI Integration:
 from src.ai_integration import *
 # Other Services:
-from config import OPENWEATHER, GNEWS, PlanRequestClass
+from src.services import *
+from config import PlanRequestClass
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
@@ -28,71 +28,28 @@ async def root():
 
 
 # My Main APIs:--->
-
 # @app.get("/health")
 # async def health():
 #     return {"status": "ok"}
 
-
 @app.get("/weather")
 async def get_weather(lat: float, lon: float):
-    # GET, 'http://127.0.0.1:8000/weather?lat=23.7104&lon=90.40744' #my_backend_api
-    if not OPENWEATHER['api_key'] or not OPENWEATHER['base_url']:
-        raise HTTPException(status_code=500, detail="OPENWEATHER_KEY or Open Weather URL not configured")
-    params = {  #payload
-        "lat": lat,
-        "lon": lon,
-        "appid": OPENWEATHER['api_key'],
-        "units": "metric"
-    }
-    async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.get(OPENWEATHER['base_url'], params=params)    #"https://api.openweathermap.org/data/2.5/weather" with payload
-
-    if r.status_code != 200:
-        raise HTTPException(status_code=502, detail="Weather API error")
-
-    return r.json()
+    return await fetch_weather(lat=lat, lon=lon)    #Just the service func() call
 
 @app.get("/news")
 async def get_news(country: str = "bd", q: str | None = None):
-    if not GNEWS['api_key'] or not GNEWS['base_url']:
-        # It's better practice to use the actual variable name in the error message
-        raise HTTPException(status_code=500, detail="GNEWS_API_KEY or URL not configured")
-
-    params = {  #payload
-        "apikey": GNEWS['api_key'],      # GNews API KEY
-        "category": "general",       # category
-        "lang": "en",                # language
-        "max": 5,                    # max results
-        "country": country           # Dynamic country (defaults to 'bd')
-    }
-
-    if q:
-        params["q"] = q
-
-    async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.get(GNEWS['base_url'], params=params)
-
-    if r.status_code != 200:
-        # Check the response text for specific GNews error messages
-        raise HTTPException(status_code=502, detail=f"GNews API error: {r.text}")
-
-    # news = r.json()
-    # print([a.get("title") for a in news.get("articles", [])[:5]])
-    return r.json()
+    return await fetch_news(country=country, q=q)
 
 # Reasoning with LLM:-
 @app.post("/plan")
 async def generate_plan(req: PlanRequestClass):
-    # fetching weather (my backend api call)
-    weather = await get_weather(req.lat, req.lon)
-    # fetching news [Default Country: BD] (my backend api call)
-    news = await get_news(country="bd")
+    # 1. Fetch data from services
+    weather = await get_weather(req.lat, req.lon)   # fetching weather (my backend api call)
+
+    news = await get_news(country="bd") # fetching news [Default Country: BD] (my backend api call)
     headlines = [a.get("title") for a in news.get("articles", [])[:5]]  # Safe extraction of the dict.get() value with default value []
 
-
-
-
+    # 2. AI Logic
     # RAG system (Ai-model) -> load_model[NAME].invoke(Message with Prompt).content:
     prompt = (
         f"User is at {req.location_name or f'{req.lat},{req.lon}'}. "
@@ -102,10 +59,12 @@ async def generate_plan(req: PlanRequestClass):
     )
     message = prompt_for_model(prompt=prompt, system_instruction="You are DayMate, a helpful daily planner.")
     # print("Prompt is ===>\n",prompt)
-    # Calling AI Model:--
-    if load_llm_objects['groq_model']:
+
+    # 3. Calling AI Model:--
+    llm = load_llm_objects['groq_model']
+    if llm:
         print("\nLLM key is Found. Prompting with LLM...\n")
-        response_obj = load_llm_objects['groq_model'].invoke(message)  # made the message with the prompt above!
+        response_obj = llm.invoke(message)  # made the message with the prompt above!
         response_text = response_obj.content
         return {"planning": response_text, "prompt": prompt}
 
@@ -113,7 +72,7 @@ async def generate_plan(req: PlanRequestClass):
 
 
     else:   # //fallback logic: manual//
-        print("LLM key not Found. manual reasoning...")
+        print("LLM Model not Available. manual reasoning...")
         plan = []
         desc = weather.get('weather')[0].get('main', '')
         if 'rain' in desc.lower():

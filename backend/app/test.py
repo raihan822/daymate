@@ -6,9 +6,3 @@
 # print(type(prompt))
 # print(prompt)
 
-my_dict = {'a': 1, 'b': 2, 'c': 3}
-# items_view =
-for key, val in my_dict.items():
-    print(key, "->",val)
-# print(list(my_dict.items())[0])
-# Output: dict_items([('a', 1), ('b', 2), ('c', 3)])

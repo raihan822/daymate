@@ -3,6 +3,10 @@ from dotenv import load_dotenv  # Loads .env file for local testing:
 load_dotenv()   #loads the api keys stored in the .env file and then acts like os.getenv() function as like os env ver
 
 # ENTRY YOUR AI MODEL SUBSCRIPTIONS HERE... ==>
+"""Check `llm_schema.py` for available attribute to be set for LLM-Models!
+# MUST INPUT:- model_name,model_api_key, model_provider, base_url #It's OPTIONAL
+# OTHER Inputs with Default:- model_top_p, model_temperature, model_max_tokens, model_timeout, model_max_retries
+"""
 from .llm_schema import AiModelClass
 MODELS_TO_LOAD: dict[str, AiModelClass]= {
     'groq_model' : AiModelClass(

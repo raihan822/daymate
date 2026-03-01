@@ -26,9 +26,9 @@ class AiModelClass(BaseModel):                  #Dictionary also doable. But pyd
     base_url: str | None = None
 
     # OTHER General Configuration Settings:-
-    model_top_p: float = 1.0,
-    model_temperature: float = 0.7,  # 0.7 is langchain default
-    model_max_tokens: Optional[int] = None,
+    model_top_p: float = 1.0
+    model_temperature: float = 0.7  # 0.7 is langchain default
+    model_max_tokens: Optional[int] = None
     # Other Configs:
-    model_timeout: int = 60,
+    model_timeout: int = 60
     model_max_retries: int = 2
