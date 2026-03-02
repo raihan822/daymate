@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()   #loads the api keys stored in the .env file and then acts like os.getenv() function as like os env ver
 
 # Feature APIs: (took Free Subscription)
+    # Set AI-Model Subscriptions in ai_integration dir.
 OPENWEATHER = {
     'api_key' : os.getenv("OPENWEATHER_KEY"),
     'base_url': "https://api.openweathermap.org/data/2.5/weather"     #GET https://api.openweathermap.org/data/2.5/weather ?lat={lat}&lon={lon}&appid={API key}

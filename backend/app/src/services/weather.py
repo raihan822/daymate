@@ -1,3 +1,5 @@
+#httpx, request etc. are used for API level call
+#asyncio is used for async type function
 import httpx    # better alternative of `requests` that I used with BS4, Sel
 from fastapi import HTTPException  #for FastAPI
 
@@ -22,4 +24,14 @@ async def fetch_weather(lat: float, lon: float):
 
 
 if __name__ == "__main__":
-    pass
+    # Local unit testing:
+    import asyncio  #used to call the async type of functions
+    lat, lon = 23.7104, 90.40744
+    response = asyncio.run(
+        fetch_weather(lat=lat, lon=lon)
+    )
+    print(f"Location set to: \n"
+          f"lat={lat}, lon={lon}\n"
+          f"temperature: {response.get('main').get('temp')}°C."
+          f"Weather Description:\n"
+          f"{response.get('weather')[0].get('description')}\n")

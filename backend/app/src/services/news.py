@@ -1,3 +1,5 @@
+#httpx, request etc. are used for API level call
+#asyncio is used for async type function call
 import httpx    # better alternative of `requests` that I used with BS4, Sel
 from fastapi import HTTPException  #for FastAPI
 
@@ -30,4 +32,15 @@ async def fetch_news(country: str = "bd", q: str | None = None):
     return r.json()
 
 if __name__ == "__main__":
-    pass
+    # Local unit testing:
+    import asyncio  #used to call the async type of functions
+    country="bd"
+    response_news = asyncio.run(
+        fetch_news(country=country)
+    )
+    headlines = [ a.get("title") for a in response_news.get("articles", [])[:5] ]  # Safe extraction of the dict.get() value with default value []
+
+    print(f"Location set to: \n"
+          f"Country = {country}\n"
+          f"Top Headlines:-\n"
+          f"{headlines}")

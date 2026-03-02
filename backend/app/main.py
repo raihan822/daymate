@@ -1,13 +1,13 @@
 #backend/main.py
-#todo: fix bug, now response from News.!
+#todo: fix bug, response from News.!
 
 from fastapi import FastAPI  #for FastAPI
 
 # AI Integration:
-from .src.ai_integration import *
+from src.ai_integration import *
 # Other Services:
-from .src.services import *
-from .config import PlanRequestClass
+from src.services import *
+from config import PlanRequestClass
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
@@ -29,8 +29,9 @@ async def root():
     }
 
 
-# My Main APIs:--->
-# @app.get("/health")
+# My Main APIs:---
+
+# @app.get("/health")   #to check API health (active or not)
 # async def health():
 #     return {"status": "ok"}
 
@@ -103,9 +104,13 @@ if __name__ == "__main__":
 
     # Async runner to call the async type functions
     import asyncio
-    result = asyncio.run(generate_plan(req=instance_payload))
-    print("Prompt is ===>\n",result.get("prompt","No Prompt Pushed!"))
-    print("\nLLM Result ===>\n",result.get("planning","No Result from LLM!"))
+    result = asyncio.run(
+        generate_plan(req=instance_payload)
+    )
+    print("Prompt is ===>\n",
+          result.get("prompt","No Prompt Pushed!"))
+    print("LLM Result ===>\n",
+          result.get("planning","No Result from LLM!"))
 
 
 
@@ -114,7 +119,7 @@ if __name__ == "__main__":
     # Start command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
 # During Dev:--
-    # uvicorn filename:fastapiObj --reload
+    # uvicorn location.to.Pyfilename:fastapiObj --reload
     # uvicorn main:app --reload
 
     # pyenv shell 3.11.14
