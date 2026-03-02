@@ -1,7 +1,7 @@
 import httpx    # better alternative of `requests` that I used with BS4, Sel
 from fastapi import HTTPException  #for FastAPI
 
-from backend.app.config import OPENWEATHER
+from ...config import OPENWEATHER
 async def fetch_weather(lat: float, lon: float):
     # GET, 'http://127.0.0.1:8000/weather?lat=23.7104&lon=90.40744' #my_backend_api
     if not OPENWEATHER['api_key'] or not OPENWEATHER['base_url']:

@@ -4,10 +4,10 @@
 from fastapi import FastAPI  #for FastAPI
 
 # AI Integration:
-from src.ai_integration import *
+from .src.ai_integration import *
 # Other Services:
-from src.services import *
-from config import PlanRequestClass
+from .src.services import *
+from .config import PlanRequestClass
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")

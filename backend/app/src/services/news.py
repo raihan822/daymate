@@ -1,7 +1,7 @@
 import httpx    # better alternative of `requests` that I used with BS4, Sel
 from fastapi import HTTPException  #for FastAPI
 
-from backend.app.config import GNEWS
+from ...config import GNEWS
 async def fetch_news(country: str = "bd", q: str | None = None):
     if not GNEWS['api_key'] or not GNEWS['base_url']:
         # It's better practice to use the actual variable name in the error message
