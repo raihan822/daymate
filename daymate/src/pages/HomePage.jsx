@@ -6,6 +6,8 @@
 ** react e <br /> is important to add /> not just <br >
 ** react e CSS attribute gular naam jemon `border-radius` likhte hobe `borderRadius` (camelCase e)
 * */
+//HomePage.jsx
+import {useNavigate} from "react-router-dom";
 import { Container, Button } from "react-bootstrap";
 
 
@@ -20,9 +22,7 @@ function BriefIntroduction() {
                 <strong>DayMate</strong> - an AI-powered assistant that helps users plan their day by combining
                 real-time weather data, local news, and intelligent recommendations.
 
-                <br />
-                <br /><strong>Scenario:</strong>
-                <br />DayMate analyzes current weather and local news to provide personalized daily planning
+                <br /><strong>Scenario:</strong> DayMate analyzes current weather and local news to provide personalized daily planning
                 suggestions.
 
                 (<a href="https://documenter.getpostman.com/view/39406886/2sAY4vh3UX"
@@ -33,42 +33,43 @@ function BriefIntroduction() {
                     rel="noopener noreferrer">PDF</a>)
             </p>
 
-            <br /><strong>Examples:</strong>
+        </div>
+    );
+}
+
+function UserManualInformation() {
+    return (
+        <div>
+            <h2>USER MANUAL</h2>
+            <p>How to use:</p>
+            <ol>
+                <li>Go to Plan to Make a Plan for the day</li>
+                <li>Give permission to Location access and see the Weather and News getting updated</li>
+                <li>(C)REATE a PRODUCT -with INFO <i>[POST method]</i></li>
+                <li>(U)PDATE a PRODUCT -with ID <i>[POST method]</i></li>
+            </ol>
+            <strong>Examples:</strong>
             <ul>
                 <li>Rain forecasted → Suggest carrying an umbrella or rescheduling outdoor plans</li>
                 <li>Clear weather → Recommend outdoor activities</li>
                 <li>Traffic alerts or emergencies → Advise schedule modifications</li>
             </ul>
-        </div>
-    );
+             <pre>
+                 <strong>Quick Starter:</strong> Go to the <strong>"{TAB1_NAME}"</strong>, give permission for location access and Generate a plan for the day.
+             </pre>
+         </div>
+     );
 }
 
-// function UserManualInformation() {
-//     return (
-//         <div>
-//             <h2>USER MANUAL</h2>
-//             <p>This Project Implements CRUD Operations, with the below Sequence:</p>
-//             <ol>
-//                 <li>(R)EAD PRODUCT List <i>[GET method]</i></li>
-//                 <li>(D)ELETE PRODUCT -with ID <i>[GET method]</i></li>
-//                 <li>(C)REATE a PRODUCT -with INFO <i>[POST method]</i></li>
-//                 <li>(U)PDATE a PRODUCT -with ID <i>[POST method]</i></li>
-//             </ol>
-//             <pre>
-//                 <strong>Quick Starter:</strong> Go to the <strong>"{TAB1_NAME}"</strong>, to see all the products list and can delete/edit etc to start from there.
-//             </pre>
-//         </div>
-//     );
-// }
-
 export default function HomePage(){
+    const navigate = useNavigate();
     return(
         <Container>
             <BriefIntroduction />
+            <UserManualInformation />
+
             <div className="d-flex justify-content-center gap-2 mb-2">
-                <Button variant="primary" size="lg">
-                    Go to Plan
-                </Button>
+                <Button variant="primary" size="lg" onClick={ ()=>{navigate('/plan')} }>Go to Plan</Button>
             </div>
         </Container>
     )

@@ -1,34 +1,39 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+/*GET CURRENT LOCATION FROM BROWSER:
+* navigator.geolocation.getCurrentPosition() //This function is provided by all modern browser to access user's location
+* then use, setPosition( {lat: .., lon:..} ) to get the coordinates!
+* */
 
-function BasicExample() {
+import { useEffect, useState } from 'react';
+
+export default function LocationComponent() {
+    // Check support during initialization to avoid a synchronous effect update
+    const [error, setError] = useState(!navigator.geolocation ? "Geolocation is not supported" : null);
+    const [position, setPosition] = useState(
+        {
+            latitude: null,
+            longitude: null
+        }
+    );
+
+    useEffect(() => {
+        if (!navigator.geolocation || error) return;    // Only proceed if geolocation exists and there is no initial error
+
+        navigator.geolocation.getCurrentPosition( (pos) => {
+                setPosition({
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                });
+            },
+            (err) => setError(err.message)
+        );
+    }, []); // Empty dependency array ensures this runs once
+
     return (
-        <Navbar expand="lg" className="bg-body-tertiary">
-            <Container>
-                <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link href="#home">Home</Nav.Link>
-                        <Nav.Link href="#link">Link</Nav.Link>
-                        <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">
-                                Another action
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="#action/3.4">
-                                Separated link
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
+        <div>
+            {error ? <p>Error: {error}</p> : (
+                <p>Latitude: {position.latitude}, Longitude: {position.longitude}</p>
+            )}
+        </div>
     );
 }
 
-export default BasicExample;

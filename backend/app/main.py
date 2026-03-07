@@ -1,6 +1,6 @@
 #backend/main.py
 #todo: fix bug, response from News.!
-
+from .middleware import setup_cors
 from fastapi import FastAPI  #for FastAPI
 
 # AI Integration:
@@ -11,6 +11,7 @@ from .config import PlanRequestClass
 
 # Making Fast API Object/Instance:
 app = FastAPI(title="DayMate API")
+setup_cors(app) # Middlewares connected for frontend request acceptability
 
 ## Homepage route (Default):---
 # from fastapi.responses import RedirectResponse
@@ -27,14 +28,11 @@ async def root():
         "docs_url": "/docs",
         "status": "running"
     }
-
-
-# My Main APIs:---
-
 # @app.get("/health")   #to check API health (active or not)
 # async def health():
 #     return {"status": "ok"}
 
+# My APIs:---
 @app.get("/weather")
 async def get_weather(lat: float, lon: float):
     return await fetch_weather(lat=lat, lon=lon)    #Just the service func() call
@@ -45,11 +43,25 @@ async def get_news(country: str = "bd", q: str | None = None):
 
 # Reasoning with LLM:-
 @app.post("/plan")
-async def generate_plan(req: PlanRequestClass):
+async def generate_plan(req: PlanRequestClass=None, weather_info:str="",news_info:str=""):
+    weather = ""
+    news = ""
     # 1. Fetch data from services
-    weather = await get_weather(req.lat, req.lon)   # fetching weather (my backend api call)
+    if weather_info and news_info:  #"both weather and news are present.
+        weather = weather_info
+        news = news_info
+    elif req is not None: #Req is present, and either weather or news maybe missing.")
+        weather = await get_weather(req.lat, req.lon)  # fetching weather (my backend api call)
 
-    news = await get_news(country="bd") # fetching news [Default Country: BD] (my backend api call)
+        # news = await get_news(country=req.location_name or 'bd') # if val None send 'bd'
+        if req.location_name:   # fetching news [Default Country: BD] (my backend api call)
+            news = await get_news(country=req.location_name)
+        else:
+            news = await get_news()  # This triggers the functions own default "BD" inside get_news()
+    else:
+        print("Insufficient Information. Please provide req.lan, req.lon or weather & news info")
+
+
     headlines = [a.get("title") for a in news.get("articles", [])[:5]]  # Safe extraction of the dict.get() value with default value []
 
     # 2. AI Logic

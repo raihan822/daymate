@@ -1,7 +1,7 @@
 // This Custom Component makes a Table out of a given Object Array [{KEY:VALUE},{...},{...}], Column Configuration
 // USED THIS Component ON THIS PROJECT's: `See All Products` table section!
 import "./TableComponent.css"
-import {getPartialMatch} from "../../utils/utilities.jsx";  //made by me,oi jsx ta theke onek gula helper function return korte pari ami future e tai export func akare pathaisi (not export default) So, received as {..}
+import {getPartialMatch} from "../../utils/utilities.js";  //made by me,oi jsx ta theke onek gula helper function return korte pari ami future e tai export func akare pathaisi (not export default) So, received as {..}
 
 /*  Instructions:
 Columns:[] =[

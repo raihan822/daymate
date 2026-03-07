@@ -7,7 +7,7 @@ export default function TabularTechnologyInformation(){
         {sl:3, name: "react-bootstrap", description: "bootstrap helper [specially for reactjs]"},
         {sl:3, name: "react-router-bootstrap", description: "bootstrap helper <`LinkContainer to`> as the alternative of <`Link to /`> tag"}
     ]
-    const table_key_names = Object.keys(technology_used[0]);    //Object.keys(your_object[0]) to get the obj key names.
+    // const table_key_names = Object.keys(technology_used[0]);    //Object.keys(your_object[0]) to get the obj key names.
 
     return (
         <TableComponent
