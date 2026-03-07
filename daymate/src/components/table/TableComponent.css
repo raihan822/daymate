@@ -1,0 +1,24 @@
+/*Only Table Component Related CSS*/
+/*
+WARNING: This css will be applied to the whole REACT APP!!!
+REASON: I didnt do,
+ filename.module.css
+ and wrote=> .tableComp, table, th, td{}
+ then on jsx do, import styles from 'filename.module.css'
+ then in code, className={styles.tableComp}
+*/
+
+/* Centers text horizontally and vertically in all table cells */
+th, td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/*adds table border*/
+table, th, td {
+    border: 1px solid black; /* width, style, color */
+}
+
+.no-border-element {
+    border: none;
+}

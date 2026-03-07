@@ -24,4 +24,4 @@ from pydantic import BaseModel  #for explicit type checking, Generally used with
 class PlanRequestClass(BaseModel):  # Payload for POST. Strict Type checked with Pydentic!
     lat: float  # BD lat == 23.7104
     lon: float  # BD lon == 90.40744
-    location_name: str | None = None
+    location_name: str | None = None    #Optional
