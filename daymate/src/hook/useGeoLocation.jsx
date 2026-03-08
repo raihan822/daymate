@@ -7,16 +7,16 @@ export default function useGeoLocation(){
         'lat' : null,
         'lon' : null
     });
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [isLocLoading, setIsLocLoading] = useState(false);
+    const [locError, setLocError] = useState(null);
 
     const fetchLocation = ()=> {    //retry function
             if (!navigator.geolocation) {
-                setError("Geolocation is not supported by your browser");
+                setLocError("Geolocation is not supported by your browser");
                 return;
             }
-            setIsLoading(true);
-            setError(null); // Reset error on new attempt
+            setIsLocLoading(true);
+            setLocError(null); // Reset error on new attempt
 
             //Main: getting current location from Browser
             navigator.geolocation.getCurrentPosition(
@@ -25,18 +25,18 @@ export default function useGeoLocation(){
                         lat: pos.coords.latitude,
                         lon: pos.coords.longitude,
                     });
-                    setIsLoading(false); // Stop loading ONLY on success
+                    setIsLocLoading(false); // Stop loading ONLY on success
                 },
                 (err) => {
-                    setIsLoading(false); // Stop loading ONLY on error
+                    setIsLocLoading(false); // Stop loading ONLY on error
                     if (err.code === 1) {
-                        setError("Permission Denied. Please enable location in browser settings.");
+                        setLocError("Permission Denied. Please enable location in browser settings.");
 
                         // alerting the user:
                         alert("Location access is blocked. Please click the 'Lock' icon in your browser's address bar to reset permission.");
                         console.error("Location access is blocked. User denied Geolocation access.");
                     } else {
-                        setError(err.message);
+                        setLocError(err.message);
 
                         // alerting the user:
                         console.error("Other location error:", err.message);
@@ -52,7 +52,7 @@ export default function useGeoLocation(){
         fetchLocation();
     }, []);
 
-    return {location, error, isLoading, fetchLocation} //js destructuring er moto kore send korlam, keys must match the exact var name.
+    return {location, locError, isLocLoading, fetchLocation} //js destructuring er moto kore send korlam, keys must match the exact var name.
 }
 
 /*How to use Hook way:

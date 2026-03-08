@@ -24,13 +24,6 @@ function BriefIntroduction() {
 
                 <br /><strong>Scenario:</strong> DayMate analyzes current weather and local news to provide personalized daily planning
                 suggestions.
-
-                (<a href="https://documenter.getpostman.com/view/39406886/2sAY4vh3UX"
-                    target="_blank"
-                    rel="noopener noreferrer">Link Class2</a>) or,
-                (<a href={'src/assets/1.1. API-Doc (CRUD Practice API Documentation PDF) (Sobuj).pdf'}
-                    target="_blank"
-                    rel="noopener noreferrer">PDF</a>)
             </p>
 
         </div>
@@ -45,8 +38,6 @@ function UserManualInformation() {
             <ol>
                 <li>Go to Plan to Make a Plan for the day</li>
                 <li>Give permission to Location access and see the Weather and News getting updated</li>
-                <li>(C)REATE a PRODUCT -with INFO <i>[POST method]</i></li>
-                <li>(U)PDATE a PRODUCT -with ID <i>[POST method]</i></li>
             </ol>
             <strong>Examples:</strong>
             <ul>

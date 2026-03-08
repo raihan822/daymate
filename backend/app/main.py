@@ -44,6 +44,16 @@ async def get_news(country: str = "bd", q: str | None = None):
 # Reasoning with LLM:-
 @app.post("/plan")
 async def generate_plan(req: PlanRequestClass=None, weather_info:str="",news_info:str=""):
+    """
+    POST localHost/plan
+    Content-Type: application/json
+    payload ==> {
+      "lat": 23.7104,
+      "lon": 90.40744,
+      "location_name": "bd"
+    }
+    """
+
     weather = ""
     news = ""
     # 1. Fetch data from services
