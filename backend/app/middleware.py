@@ -7,7 +7,7 @@ def setup_cors(app):
     origins = [
         "http://localhost:5173",      # React default local port 3000
         "http://127.0.0.1:5173",
-        "https://your-app.vercel.app" # Deployed React frontend URL of Vercel
+        "https://daymate-iota.vercel.app" # Deployed React frontend URL of Vercel
     ]
 
     app.add_middleware(
