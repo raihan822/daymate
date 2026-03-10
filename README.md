@@ -212,10 +212,10 @@ npm run dev
 ---
 
 # Environment variables
+**For Backend**:-
 
 Use `.env` locally or set them in your deployment environment.
-
-Example `.env` (see `backend/.env.example`):
+<br>Example `.env` (see `backend/.env.example`):
 
 ```env
 OPENWEATHER_KEY=_openweather_key_
@@ -224,8 +224,17 @@ OPENAI_API_KEY=_openai_key_    # optional - helpful for some LLM setups
 GROQ_API_KEY=_groq_key_      # optional - if set, LLM path will be used
 PORT=8000
 ```
+**For Frontend**:-
 
-**Security note:** do not commit your real keys to git. Use Render/Heroku/Netlify secrets or OS environment variables in production.
+```env
+#.env.development:
+VITE_API_BASE_URL='localhost_link'
+
+#.env.production:
+VITE_API_BASE_URL ='render_backend_link'
+```
+
+> **Security note:** do not commit your real keys to git. Use Render/Heroku/Netlify secrets or OS environment variables in production.
 
 ---
 
@@ -341,11 +350,9 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 # Future Plan:
 
-* **Frontend** is pending; the repo contains a `frontend/` scaffold. I will use **React framework** for the frontend. When the frontend is ready, I will update the README and CORS settings if needed.
 * will add a `/health` or `/ping` endpoint for uptime checks (for load balancers/uptime monitors).
 * Will add unit tests for the fallback planner and input validation.
 * will add rate-limiting / caching of 3rd-party responses to avoid hitting API quotas.
-* The LLM prompt and chaining will be moved later to a separate module for easier testing and more advanced RAG.
 
 ---
 
