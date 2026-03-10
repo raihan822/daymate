@@ -1,7 +1,13 @@
-# all .env files
-*.env
-
 # Node modules and other dependencies
 node_modules/
 venv/
 __pycache__/
+
+# Ignore all env files
+.env
+.env.*
+
+
+# Must Upload!              Exclude the below files from ignore (should be listed at end)
+# below one inlcudes both !.env.example, !.env.*.example
+!.env*.example

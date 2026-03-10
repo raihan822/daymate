@@ -1,9 +1,10 @@
 # DayMate
+> Link: **[https://daymate-iota.vercel.app/](https://daymate-iota.vercel.app/)** <br>
+
 
 **DayMate**, an AI-powered daily planner that combines weather + news to produce a short daily plan and recommendations with a Lightweight FastAPI backend.
-
-> Live backend: **[https://daymate-bitmascot-backend.onrender.com](https://daymate-bitmascot-backend.onrender.com)** <br>
-> API docs (Swagger UI): **[https://daymate-bitmascot-backend.onrender.com/docs](https://daymate-bitmascot-backend.onrender.com/docs)**
+> Backend deployed at: **[https://daymate-bitmascot-backend.onrender.com](Here)** <br>
+> API docs (Swagger UI): **[https://daymate-bitmascot-backend.onrender.com/docs](Click Here)**
 
 ---
 
@@ -39,7 +40,11 @@ The codebase is intentionally small, so it is easy to run locally and deploy.
 ---
 
 # Features
+**Frontend features**:-
+* Provides information of the used tech-stacks
+* Dedicated Plan page to see current weather and news, Press `Generate Plan` to get schedule for the day
 
+**Backend features**:-
 * `/weather` — current weather using OpenWeather.
 * `/news` — top headlines (GNews).
 * `/plan` — POST endpoint that aggregates weather + headlines and either:
@@ -52,26 +57,115 @@ The codebase is intentionally small, so it is easy to run locally and deploy.
 
 # Repository structure
 
-```
-daymate/
-├─ backend/
-│ ├─ main.py
-│ ├─ requirements.txt
-│ └─ .env.example
-├─ frontend/    (frontend pending [with React+vite])
-└─ README.md
+```text
+├── backend             // Backend with FastAPI
+│   ├── app
+│   │   ├── config.py
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── middleware.py
+│   │   ├── __pycache__
+│   │   │   ├── config.cpython-311.pyc
+│   │   │   ├── __init__.cpython-311.pyc
+│   │   │   ├── main.cpython-311.pyc
+│   │   │   └── middleware.cpython-311.pyc
+│   │   ├── src
+│   │   │   ├── ai_integration              // LLM Integration
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── llm_config.py
+│   │   │   │   ├── llm_model.py
+│   │   │   │   ├── llm_schema.py
+│   │   │   │   ├── __pycache__
+│   │   │   │   │   ├── __init__.cpython-311.pyc
+│   │   │   │   │   ├── llm_config.cpython-311.pyc
+│   │   │   │   │   ├── llm_model.cpython-311.pyc
+│   │   │   │   │   └── llm_schema.cpython-311.pyc
+│   │   │   │   └── requirements.txt
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   └── __init__.cpython-311.pyc
+│   │   │   └── services
+│   │   │       ├── __init__.py
+│   │   │       ├── news.py
+│   │   │       ├── __pycache__
+│   │   │       │   ├── __init__.cpython-311.pyc
+│   │   │       │   ├── news.cpython-311.pyc
+│   │   │       │   └── weather.cpython-311.pyc
+│   │   │       └── weather.py
+│   │   └── test.py
+│   ├── __pycache__
+│   ├── README.md
+│   └── requirements.txt
+├── daymate             // Frontend
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   └── icons8-planner-48.png
+│   ├── REACT_BestPractices.md
+│   ├── REACT_useState data assigning.md
+│   ├── README.md
+│   ├── src
+│   │   ├── api
+│   │   │   ├── baseUrl.js
+│   │   │   ├── news.js
+│   │   │   └── weather.js
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   ├── components
+│   │   │   ├── button
+│   │   │   │   ├── ButtonComponent.css
+│   │   │   │   └── ButtonComponent.jsx
+│   │   │   ├── form (not used)
+│   │   │   │   ├── FormComponent.css
+│   │   │   │   └── FormComponent.jsx
+│   │   │   ├── loader
+│   │   │   │   ├── LoaderComponent.css
+│   │   │   │   └── LoaderComponent.jsx
+│   │   │   ├── location
+│   │   │   ├── pdfComponent (not used)
+│   │   │   │   └── EmbededPdfComponent.jsx
+│   │   │   ├── README.md
+│   │   │   └── table
+│   │   │       ├── TableComponent.css
+│   │   │       ├── TableComponent.jsx
+│   │   │       └── TableComponentPro.jsx
+│   │   ├── hook
+│   │   │   ├── README.md
+│   │   │   ├── useFetch.jsx
+│   │   │   └── useGeoLocation.jsx
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── News.jsx
+│   │   │   ├── Plan.jsx
+│   │   │   ├── TechStackUsed.jsx
+│   │   │   ├── Test.jsx
+│   │   │   └── Weather.jsx
+│   │   └── utils
+│   │       ├── getGeolocation.js
+│   │       ├── README.md
+│   │       └── utilities.js
+│   └── vite.config.js
+└── README.md
 ```
 
-`backend/main.py` contains the FastAPI app and all endpoint logic.
+`backend/app/` contains the **FastAPI** app and all endpoint logic.<br>
+`daymate/` folder conatins all the frontend logic of **React+Vite**
 
 ---
 
 # Requirements
 
 * Python 3.11+ recommended (code was tested with pyenv 3.11.x)
-* Packages (see `backend/requirements.txt`):
+* Backend Packages (see `backend/requirements.txt`):
 
   * fastapi, uvicorn, httpx, pydantic, langchain-openai, python-dotenv
+* Frontend Packages (see `daymate/package.json`):
+  * axios, bootstrap, react, react-bootstrap, react-dom, react-markdown, react-router-dom
 
 ---
 
@@ -103,7 +197,7 @@ cp .env.example .env
 
 ```bash
 # recommended during development - auto-reload
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 5. Open docs in your browser:
@@ -111,7 +205,10 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 http://127.0.0.1:8000/docs
 ```
-
+- And run frontend in your local machine:
+```bash
+npm run dev
+```
 ---
 
 # Environment variables
