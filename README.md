@@ -227,6 +227,7 @@ PORT=8000
 **For Frontend**:-
 
 ```env
+# Add base url without ending slash is best practice!
 #.env.development:
 VITE_API_BASE_URL='localhost_link'
 
