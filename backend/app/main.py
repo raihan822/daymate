@@ -143,6 +143,7 @@ if __name__ == "__main__":
 # During Dev:--
     # uvicorn location.to.Pyfilename:fastapiObj --reload
     # uvicorn main:app --reload
+    # uvicorn backend.app.main:app --reload     #from project root
 
     # pyenv shell 3.11.14
     # uvicorn main:app --reload --port $PORT
