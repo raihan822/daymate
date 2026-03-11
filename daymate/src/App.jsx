@@ -16,7 +16,7 @@ import Weather from "./pages/Weather.jsx";
 import News from "./pages/News.jsx";
 
 // TAB Names:
-export const TAB1_NAME = 'Plan'
+export const TAB1_NAME = 'Make Plan'
 export const TAB2_NAME = 'Weather'
 export const TAB3_NAME = 'News'
 
@@ -28,7 +28,7 @@ function App() {
   return (
       <Container>
           {/*Section: NAVBAR*/}
-          <Navbar expand="lg">
+          <Navbar expand="lg" sticky='top' bg="light">
               <Navbar.Brand as={Link} to="/">DAYMATE</Navbar.Brand>
 
               <Navbar.Toggle aria-controls="basic-navbar-nav" />

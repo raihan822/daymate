@@ -1,6 +1,6 @@
 // This Custom Component makes a Table out of a given Object Array [{KEY:VALUE},{...},{...}], Column Configuration
 // USED THIS Component ON THIS PROJECT's: `See All Products` table section!
-import "./TableComponent.css"
+import "./TableComponentPro.css"
 import {getPartialMatch} from "../../utils/utilities.js";  //made by me,oi jsx ta theke onek gula helper function return korte pari ami future e tai export func akare pathaisi (not export default) So, received as {..}
 
 /*  Instructions:
@@ -22,14 +22,15 @@ Columns:[] =[
 export default function TableComponentPro({ caption="",
                                             dataObjArray = [],  //[This is --MAIN-- API Data received from API response] data api table e majhe majhe na o thakte pare
                                             columns = [],       //[This is the Column structure] allowed column names, their keys with api, and any render html if any
-                                            footNote="" }){
+                                            footNote=""            //can also send a jsx instead with no quote. <>..your footnotes..</> to execute like html  tag
+}){
     /*  Note:-
     usee this for CAPITALISED WORD:=>   text.toUpperCase()
     use fort first Char Capped in JS:=>    text.charAt(0).toUpperCase() + text.slice(1)
     * */
 
     //Default case: if no data on the array:
-    if (dataObjArray.length === 0) return <p>No data available</p>;
+    if (dataObjArray.length === 0) return <div className="table-empty">No data available</div>;
 
     //Otherwise: Continue:
     const KEY_NAMES = Object.keys(dataObjArray[0]); //list of obj, so took the fist obj only to see its key names.  //returns a list of strings
@@ -38,33 +39,48 @@ export default function TableComponentPro({ caption="",
     const NUMBER_OF_COLUMNS = columns.length;
 
     return (
-        <table>
-            {caption !== "" && <caption><strong>{caption.toUpperCase()}</strong></caption>}
-            <thead>
-                <tr>
-                    {columns.map( (col, colIndex) =>
-                        <th key={colIndex} scope="col">{col.header}</th>
-                    )}
-                </tr>
-            </thead>
-            <tbody>
-                {dataObjArray.map(  //API result [] e map korle ekta ekta object data dhortese ekta kore tr create hobe. ekhane main target hocche koyta td hobe shera align kora uporer th er sathe
-                    (data, rowIndex) =>
-                        <tr key={data[SL] || rowIndex}>
-                            {columns.map( (col, colIndex) =>
-                                <td key={colIndex} scope="col">
-                                    {col.render? col.render(data) : data[col.key]} {/* jodi api key col hoy tahole apiData er key value, or jodi render key hoye then render the buttons*/}
-                                </td>
-                            )}
-                        </tr>
+        <div className="table-container">
+            <table className="table-pro     table table-hover table-bordered table-sm">
+
+                {caption && (
+                    <caption className="table-caption">
+                        {caption.toUpperCase()}
+                    </caption>
                 )}
-            </tbody>
-            <tfoot>
-                {footNote!=="" &&
+
+                <thead>
+                <tr>
+                    {columns.map((col, colIndex) => (
+                        <th key={colIndex} scope="col">
+                            {col.header}
+                        </th>
+                    ))}
+                </tr>
+                </thead>
+
+                <tbody>
+                {dataObjArray.map((data, rowIndex) => (
+                    <tr key={data[SL] || rowIndex}>
+                        {columns.map((col, colIndex) => (
+                            <td key={colIndex}>
+                                {col.render ? col.render(data) : data[col.key]}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+                </tbody>
+
+                {footNote && (
+                    <tfoot>
                     <tr>
-                        <td colSpan={NUMBER_OF_COLUMNS}>{footNote}</td>
-                    </tr>}
-            </tfoot>
-        </table>
-    )
+                        <td colSpan={NUMBER_OF_COLUMNS}>
+                            {footNote}
+                        </td>
+                    </tr>
+                    </tfoot>
+                )}
+
+            </table>
+        </div>
+    );
 }

@@ -1,11 +1,18 @@
 //Plan.jsx
 //[Mukhosto] jei function e useCallBack() use kora hoy sheta jodi useEffect diye call kori, tahole sheta useEffect er dependecy[] teo rakhte hobe. along with other dependable variables on the task.
 
-import useGeoLocation from "../hook/useGeoLocation.jsx";
-import {useEffect, useState} from "react";
-import {Button} from "react-bootstrap";
-import useFetch from "../hook/useFetch.jsx";
 import {BASE_URL} from "../api/baseUrl.js";
+import {useEffect, useState} from "react";
+import {Alert, Button} from "react-bootstrap";
+
+// My CustomHooks:
+import useGeoLocation from "../hook/useGeoLocation.jsx";
+import useFetch from "../hook/useFetch.jsx";
+    //api based customHooks:
+import useWeather from "../hook/useWeather.jsx";
+import useNews from "../hook/useNews.jsx";
+
+// My components:
 import LoaderComponent from "../components/loader/LoaderComponent.jsx";
 import ReactMarkdown from 'react-markdown';
 
@@ -14,21 +21,15 @@ export default function Plan(){
     const {location, isLocLoading, locError, fetchLocation} = useGeoLocation();
 
     // WEATHER:
-    const {data:weather, loading: isWeatherLoading, fetchData: fetchWeather} = useFetch(`${BASE_URL}/weather`, {params:{lat: location.lat, lon: location.lon}}, false);
-    useEffect(()=>{
-            if(location.lat && location.lon){
-                fetchWeather({params:{lat: location.lat, lon: location.lon}});
-            }
-        }, [location.lon, location.lat, fetchWeather]
-    );
-    const weather_descrition = weather?.weather?.[0].description?? "No description available";  //<python> weather_descrition = weather.get('weather')[0].get('description');
-    const weathre_temperature = weather?.main?.temp?? "Temp not found"; //<python> weathre_temperature = weather.get('main').get('temp');
+    const {weather, isWeatherLoading, description, temperature} = useWeather(location);
+
+    const weather_descrition = description;
+    const weathre_temperature = temperature;
+    const _weather_humidity = weather?.main?.humidity ?? "--";  //etc you can get from api
 
     // NEWS:
     const country_name = 'bd'
-    const {data:news, loading: isNewsLoading, fetchData: fetchNews} = useFetch(`${BASE_URL}/news`, {params:{country_name: country_name}}, true);
-    //<python> headlines = [a.get("title") for a in news.get("articles", [])[:10]]  # Safe extraction of the dict.get() value with default value []
-    // const headlines = news?.articles?.slice(0, 10).map(a => a.title) || [];
+    const {news, isNewsLoading, headlines, infoMessage} = useNews(country_name);
 
     // PLAN:
     const [generatePlanRequested, setGeneratePlanRequested] = useState(false);
@@ -73,65 +74,127 @@ export default function Plan(){
     }, [generatePlanRequested, location.lat, location.lon, fetchPlan]);
 
     return (
-        <div className={'container'}>
-            <h1>DayMate Planner</h1>
-            <h2>Generate your Plan for the Day on DayMate</h2>
-            {locError && <p className="text-danger">{locError}</p>}
+        <div className="container py-5">
+            {/* HEADER */}
+            <div className="text-center mb-5">
+                <h1 className="fw-bold">DayMate Planner</h1>
+                <p className="text-muted fs-5">
+                    Smart daily planning based on your weather, location and news
+                </p>
+            </div>
 
+            {locError && <p className="text-danger text-center">{locError}</p>}
 
-            <div className="row">
-                <div className="col-6">
-                    <div>Weather: {isWeatherLoading ? "Loading..." : weathre_temperature}</div>
-                    <div>Description: {isWeatherLoading ? "Loading..." : weather_descrition}</div>
+            {/* WEATHER + LOCATION */}
+            <div className="row g-4 mb-4 justify-content-between">
+
+                {/* WEATHER CARD */}
+                <div className="col-md-6">
+                    <div className="card shadow-sm border-0 h-100 w-100">
+                        <div className="card-body justify-content-center">
+                            <h5 className="card-title mb-3">🌤 Weather</h5>
+
+                            {isWeatherLoading ? (<LoaderComponent />) : (
+                                <>
+                                    <h2 className="fw-bold">{weathre_temperature}°C</h2>
+                                    <p className="text-muted text-capitalize">
+                                        {weather_descrition}
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
-                <div className="col-6">
-                    <div>Location: lat={location.lat ?? "N/A"}, lon={location.lon ?? "N/A"}</div>
-                    <Button variant="primary" onClick={fetchLocation}>
-                        {isLocLoading ? "Fetching..." : "Fetch Location Again"}
-                    </Button>
+
+                {/* LOCATION CARD */}
+                <div className="col-md-6">
+                    <div className="card shadow-sm border-0 h-100 w-100">
+                        <div className="card-body justify-content-center">
+                            <h5 className="card-title mb-3">📍 Location</h5>
+
+                            <p className="text-muted">
+                                Lat: <b>{location.lat ?? "N/A"}</b>
+                                <br />
+                                Lon: <b>{location.lon ?? "N/A"}</b>
+                            </p>
+
+                            <Button variant="outline-primary" onClick={fetchLocation}>
+                                {isLocLoading ? "Fetching..." : "Refresh Location"}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="row mt-3">
-                <h4>News ({isNewsLoading ? "Loading..." : news?.totalArticles?? 0})</h4>
+            {/* NEWS SECTION */}
+            <div className="card shadow-sm border-0 mb-4">
+                <div className="card-body">
+                    <h5 className="mb-3">
+                        📰 News
+                        <span className="badge bg-secondary ms-2">
+                            {isNewsLoading ? "..." : news?.totalArticles ?? 0}
+                        </span>
+                    </h5>
 
-                {isNewsLoading? <LoaderComponent />:
-                    <ul>
-                        {news?.articles?.slice(0, 10).map((item, idx) => (
-                            <li key={idx}>
-                                <a id={item.id} href={item.url} target="_blank" rel="noopener noreferrer">
-                                    {item.title}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                }
+                    {infoMessage && (
+                        <Alert variant="warning" className="mb-4">
+                            {infoMessage}
+                        </Alert>
+                    )}
+
+                    {isNewsLoading ? (<LoaderComponent />) : headlines.length === 0 ? (
+                        <p className="text-center text-muted">
+                            No news articles available right now.
+                        </p>
+                    ) : (<ul className="list-group list-group-flush">
+                            {news?.articles?.slice(0, 10).map((item, idx) => (
+                                <li key={idx} className="list-group-item">
+                                    <a
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-decoration-none"
+                                    >
+                                        {item.title}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>)}
+                </div>
             </div>
 
-
-            <Button className="mt-3" onClick={handleGeneratePlan} disabled={!location.lat || !location.lon || isPlanLoading}>
-                {
-                    !location.lat
+            {/* GENERATE PLAN BUTTON */}
+            <div className="text-center mb-4">
+                <Button
+                    size="lg"
+                    variant="primary"
+                    onClick={handleGeneratePlan}
+                    disabled={!location.lat || !location.lon || isPlanLoading}
+                >
+                    {!location.lat
                         ? "Waiting for location..."
                         : isPlanLoading
                             ? "Generating Plan..."
-                            : "Generate Plan"
-                }
-            </Button>
+                            : "Generate My Day Plan"}
+                </Button>
+            </div>
+
+            {/* AI PLAN */}
             {hasGenerated && (
-                <div className="row mt-3">
-                    {isPlanLoading ? <LoaderComponent /> : (
-                        <div className="card shadow-sm border-0 my-4">
-                            <h4>Here is your Plan for the Day:</h4>
-                            <div className="card-body p-4">
-                                <div className="ai-content lh-lg text-secondary">
-                                    <ReactMarkdown>{plan?.planning ?? "N/A"}</ReactMarkdown>
-                                </div>
+                <div className="card shadow border-0">
+                    <div className="card-body p-4">
+                        <h4 className="mb-3">🧠 Your AI Generated Plan</h4>
+                        {isPlanLoading ? (<LoaderComponent />) : (
+                            <div className="ai-content lh-lg text-secondary">
+                                <ReactMarkdown>
+                                    {plan?.planning ?? "No plan generated."}
+                                </ReactMarkdown>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             )}
+
         </div>
     );
 }
