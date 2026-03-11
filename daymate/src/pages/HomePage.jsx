@@ -7,8 +7,11 @@
 ** react e CSS attribute gular naam jemon `border-radius` likhte hobe `borderRadius` (camelCase e)
 * */
 //HomePage.jsx
+// my customHooks:
+import useLimitedTimeAlertMsg from "../hook/useLimitedTimeAlertMsg.jsx";
+
 import {useNavigate} from "react-router-dom";
-import { Container, Button, Card } from "react-bootstrap";
+import { Container, Button, Card, Alert } from "react-bootstrap";
 
 
 // My files:
@@ -83,6 +86,12 @@ function UserManualInformation() {
 
 export default function HomePage(){
     const navigate = useNavigate();
+    const {show, alertMessage} = useLimitedTimeAlertMsg(
+        'Info: First API response may take about 30-60s due to Render wakeup time for the backend.',
+        20000,   //show for 20s
+        1000    // start delay in ms
+    )
+
     return(
         <Container className="py-5">
 
@@ -93,6 +102,9 @@ export default function HomePage(){
                     AI-powered daily planning based on your weather,
                     location and latest news.
                 </p>
+
+                {/*Optional: Alert msg during development*/}
+                {show && (<Alert variant="warning" className="mb-4">{alertMessage}</Alert>)}
             </div>
 
             <BriefIntroduction />

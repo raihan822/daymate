@@ -8,6 +8,7 @@ import {Alert, Button} from "react-bootstrap";
 // My CustomHooks:
 import useGeoLocation from "../hook/useGeoLocation.jsx";
 import useFetch from "../hook/useFetch.jsx";
+import useLimitedTimeAlertMsg from "../hook/useLimitedTimeAlertMsg.jsx";
     //api based customHooks:
 import useWeather from "../hook/useWeather.jsx";
 import useNews from "../hook/useNews.jsx";
@@ -19,6 +20,11 @@ import ReactMarkdown from 'react-markdown';
 export default function Plan(){
     // My Custom Hook (reactive) usable just by calling!:
     const {location, isLocLoading, locError, fetchLocation} = useGeoLocation();
+    const {show, alertMessage} = useLimitedTimeAlertMsg(
+        'Info: First API response may take about 30-60s due to Render wakeup time for the backend.',
+        20000,   //show for 20s
+        1000    // start delay in ms
+    )
 
     // WEATHER:
     const {weather, isWeatherLoading, description, temperature} = useWeather(location);
@@ -30,6 +36,11 @@ export default function Plan(){
     // NEWS:
     const country_name = 'bd'
     const {news, isNewsLoading, headlines, infoMessage} = useNews(country_name);
+    const headlineCount = isNewsLoading
+        ? "..."
+        : infoMessage
+            ? 0
+            : news?.totalArticles ?? 0;
 
     // PLAN:
     const [generatePlanRequested, setGeneratePlanRequested] = useState(false);
@@ -81,6 +92,9 @@ export default function Plan(){
                 <p className="text-muted fs-5">
                     Smart daily planning based on your weather, location and news
                 </p>
+
+                {/*Optional: Alert msg during development*/}
+                {show && (<Alert variant="warning" className="mb-4">{alertMessage}</Alert>)}
             </div>
 
             {locError && <p className="text-danger text-center">{locError}</p>}
@@ -131,9 +145,7 @@ export default function Plan(){
                 <div className="card-body">
                     <h5 className="mb-3">
                         📰 News
-                        <span className="badge bg-secondary ms-2">
-                            {isNewsLoading ? "..." : news?.totalArticles ?? 0}
-                        </span>
+                        <span className="badge bg-secondary ms-2">{headlineCount}</span>
                     </h5>
 
                     {infoMessage && (

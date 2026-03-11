@@ -1,11 +1,18 @@
+// customHooks:
 import useGeoLocation from "../hook/useGeoLocation.jsx";
+import useLimitedTimeAlertMsg from "../hook/useLimitedTimeAlertMsg.jsx";
+
 import useWeather from "../hook/useWeather.jsx";
 
-import {Container, Card, Row, Col, Button} from "react-bootstrap";
-
+import {Container, Card, Row, Col, Button, Alert} from "react-bootstrap";
 
 export default function Weather(){
     const {location, locError, isLocLoading, fetchLocation} = useGeoLocation();
+    const {show, alertMessage} = useLimitedTimeAlertMsg(
+        'Info: First API response may take about 30-60s due to Render wakeup time for the backend.',
+        20000,   //show for 20s
+        1000    // start delay in ms
+    )
 
     // WEATHER:
     const {weather, isWeatherLoading,description, temperature} = useWeather(location);
@@ -21,6 +28,9 @@ export default function Weather(){
             <div className="text-center mb-5">
                 <h1 className="fw-bold">Weather Dashboard</h1>
                 <p className="text-muted">Real-time weather based on your location</p>
+
+                {/*Optional: Alert msg during development*/}
+                {show && (<Alert variant="warning" className="mb-4">{alertMessage}</Alert>)}
             </div>
 
             {locError && <p className="text-danger text-center">{locError}</p>}
@@ -29,18 +39,11 @@ export default function Weather(){
             <Card className="shadow border-0 mb-4">
                 <Card.Body className="text-center">
 
-                    {isWeatherLoading ? (
-                        <p>Loading weather...</p>
-                    ) : (
+                    {isWeatherLoading ? (<p>Loading weather...</p>) : (
                         <>
                             <h3 className="text-muted">{weather?.name}, {weather?.sys?.country}</h3>
-
                             {iconUrl && (
-                                <img
-                                    src={iconUrl}
-                                    alt="weather icon"
-                                    style={{width:80}}
-                                />
+                                <img src={iconUrl} alt="weather icon" style={{width:80}} />
                             )}
 
                             <h1 className="display-4 fw-bold">

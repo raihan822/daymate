@@ -1,9 +1,21 @@
-import {Container, Card, Row, Col, Badge, Alert} from "react-bootstrap";
 import useNews from "../hook/useNews.jsx";
+// customHook:
+import useLimitedTimeAlertMsg from "../hook/useLimitedTimeAlertMsg.jsx";
+
+import {Container, Card, Row, Col, Badge, Alert} from "react-bootstrap";
 
 export default function News(){
-
     const {news, headlines, isNewsLoading, infoMessage} = useNews("bd");
+    const {show, alertMessage} = useLimitedTimeAlertMsg(
+        'Info: First API response may take about 30-60s due to Render wakeup time for the backend.',
+        20000,   //show for 20s
+        1000    // start delay in ms
+    )
+    const headlineCount = isNewsLoading
+        ? "..."
+        : infoMessage
+            ? 0
+            : news?.totalArticles ?? 0;
 
     return (
         <Container className="py-5">
@@ -14,6 +26,9 @@ export default function News(){
                 <p className="text-muted">
                     Latest headlines based on your selected country
                 </p>
+
+                {/*Optional: Alert msg during development*/}
+                {show && (<Alert variant="warning" className="mb-4">{alertMessage}</Alert>)}
             </div>
 
             {/* Main News Card */}
@@ -21,9 +36,7 @@ export default function News(){
                 <Card.Body className="text-center">
                     <h3 className="mb-3">
                         Top Headlines
-                        <Badge bg="secondary" className="ms-2">
-                            {isNewsLoading ? "..." : news?.totalArticles ?? 0}
-                        </Badge>
+                        <Badge bg="secondary" className="ms-2">{headlineCount}</Badge>
                     </h3>
 
                     <p className="text-muted">
