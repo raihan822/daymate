@@ -16,6 +16,7 @@ MODELS_TO_LOAD: dict[str, AiModelClass]= {
         base_url="https://api.groq.com/openai/v1"
     )
 
+    # Include more of your models here...
 }
 
 
