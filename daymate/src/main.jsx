@@ -9,7 +9,7 @@ import App from './App.jsx'
  */
 // bootstrap + React-Bootstrap and React-router-dom:
 import 'bootstrap/dist/css/bootstrap.min.css';  // only requires the bootstrap import.
-import {BrowserRouter} from "react-router-dom";
+import {BrowserRouter} from "react-router-dom"; // npm install react-router-dom
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
