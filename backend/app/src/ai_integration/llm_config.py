@@ -35,7 +35,7 @@ def prompt_for_model(prompt: str, system_instruction: str)-> list[BaseMessage]:
     # ]
 
     #NewStyle:
-    message = [
+    message :list = [
         SystemMessage(content=system_instruction),
         HumanMessage(content=prompt)
     ]
