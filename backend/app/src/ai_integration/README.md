@@ -27,7 +27,10 @@ You are gonna use two methods,
         response_obj = llm.invoke(message)
 
         #response_text = response_obj.content[0].get('text', 'No text returned') #if Google's gemini model
-        response_text = response_obj.content
+        if isinstance(response_obj.content, list):  #gemini model onek shomoy list of dict['text'] e response dae
+                    response_text = response_obj.content[0].get('text', 'No text returned')
+                else:
+                    response_text = response_obj.content
         return {"planning": response_text, "prompt": prompt}
     else:
         #fallback logic
