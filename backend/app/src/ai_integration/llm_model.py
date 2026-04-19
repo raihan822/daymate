@@ -5,16 +5,16 @@
 Layer 1 → Raw provider SDK (different company has different native style of calling)
 Layer 2 → API abstraction (LiteLLM)
 Layer 3 → Framework abstraction (LangChain)
-    > I am using LangChain's only the OpenAi format schema generalization 'langchain_openai'.
+    > I am using LangChain's only the OpenAi format schema generalization 'langchain_openai' -supported by Google.
 '''
-from langchain_core.language_models import BaseChatModel #[Optional] for return type check.
+from langchain_core.language_models import BaseChatModel #[Optional] for return type check. BaseChatModel means, langchain ekta llm model object return kore. so return type to ar normal py object na, langchain BaseModel type object tai eta import kore bujhano je ei type return ashbe!
 from typing import Optional, Union
 from pydantic import SecretStr
 def load_llm(
         # Required Params:-
         model_provider: str,
         model_name :str,
-        model_api_key :Union[str, SecretStr],
+        model_api_key :Union[str, SecretStr], # Union[] is for backward compatibilty. not used anymore. you can just do : str|SecretStr instead
 
         # [Optional] BASE_URL (Required for OpenAI-compatible APIs Providers like GROQ,ChatGPT, etc.)
         base_url: Optional[str] = None,
@@ -28,10 +28,10 @@ def load_llm(
         model_max_retries:int = 2
 ) -> BaseChatModel:
     # #Can be used to convert a str to secretstr for langchain params:-
-    # from langchain_core.utils import convert_to_secret_str    #now you can use `convert_to_secret_str()` function to get raw value of api_key
+    # from langchain_core.utils import convert_to_secret_str    #now you can use `convert_to_secret_str()` function to get masked value of api_key (Langchain version of SecretStr) with it, you ccan your get_secret_key() too
 
-    if not model_api_key.get_secret_value():
-        raise ValueError(f"API Key not found. {model_api_key}")
+    if not model_api_key.get_secret_value():    # .get_secret
+        raise ValueError(f"API Key not found. {model_api_key}") # try..except er baire raise thakle eta code terminate kore dae.
     raw_api_key = model_api_key.get_secret_value() if isinstance(model_api_key, SecretStr) else model_api_key
 
     model_provider = model_provider.lower()

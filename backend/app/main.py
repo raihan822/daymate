@@ -75,6 +75,7 @@ async def generate_plan(req: PlanRequestClass=None, weather_info:str="",news_inf
     headlines = [a.get("title") for a in news.get("articles", [])[:5]]  # Safe extraction of the dict.get() value with default value []
 
     # 2. AI Logic
+    # First set the llm_config then come back here.
     # RAG system (Ai-model) -> load_model[NAME].invoke(Message with Prompt).content:
     prompt = (
         f"User is at {req.location_name or f'{req.lat},{req.lon}'}. "
