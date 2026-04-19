@@ -9,7 +9,7 @@ load_dotenv()   #loads the api keys stored in the .env file and then acts like o
 """
 from .llm_schema import AiModelClass
 MODELS_TO_LOAD: dict[str, AiModelClass]= {
-    'groq_model' : AiModelClass(
+    'groq_model' : AiModelClass(    #so, later eta use korar jonno model key name er sathe match koray eta use korte hobe
         model_name="llama-3.3-70b-versatile",
         model_api_key=os.getenv("GROQ_API_KEY"),  # Pydentic will auto convert this str into SecretStr! You can do --> `raw_key = instance_groq_model.api_key.get_secret_value()` to read/get actual api_key value.
         model_provider="openai",
