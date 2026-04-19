@@ -21,10 +21,15 @@ You are gonna use two methods,
         )
     
     # 3. Calling AI Model:--
-    llm = load_llm_objects['model_key_in_llm_config']
+    llm = load_llm_objects['model_key_in_llm_config']   #load_llm_objects itself is a dictionary but dynamic pydantic dictionary. just give the key wich model to prepare and it will do so.
     if llm:
         print("\nLLM Api key is Found\n")
         response_obj = llm.invoke(message)
+
+        #response_text = response_obj.content[0].get('text', 'No text returned') #if Google's gemini model
         response_text = response_obj.content
         return {"planning": response_text, "prompt": prompt}
+    else:
+        #fallback logic
+        print("llm model not available")
 ```
